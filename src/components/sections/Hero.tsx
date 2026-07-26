@@ -177,7 +177,7 @@ export function Hero() {
             {/* Delay pushed to 420ms — after the CTAs (320ms) rather than
                 before them, so HeroVisual is now the second-to-last beat in
                 the entrance sequence, with the connection line closing it out. */}
-            <div className="animate-fade-in-up" style={{ animationDelay: "420ms" }}>
+          <div className="w-full animate-fade-in-up" style={{ animationDelay: "420ms" }}>
               <HeroVisual className="max-w-md lg:max-w-none" />
             </div>
           </HeroScrollFade>
