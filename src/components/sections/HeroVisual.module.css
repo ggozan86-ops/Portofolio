@@ -1,0 +1,105 @@
+/*
+ * Scoped to HeroVisual only. Kept as a CSS Module (not globals.css or
+ * tailwind.config.ts) so this component's motion can evolve without
+ * touching any shared architecture file.
+ *
+ * Every keyframe animates `transform` only — translateY and rotate are both
+ * GPU-composited and never trigger layout or paint of surrounding content.
+ * `prefers-reduced-motion` is already handled globally in `globals.css`
+ * (a `*` selector that forces near-zero animation duration), so it applies
+ * to these classes automatically without needing to repeat that rule here.
+ */
+
+@keyframes floatLaptop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes floatPhone {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Orb's own gentle vertical drift — independent element from the parallax
+   wrapper (which owns the mouse-driven translate) and from orbSpin (which
+   owns the internal rotation), so none of the three transforms fight for
+   the same property. A longer, slightly offset duration from the laptop
+   and phone keeps all three reading as separately-suspended objects rather
+   than one synced rig. */
+@keyframes floatOrb {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Very slow, very soft breathing on the orb's outer glow only — opacity
+   and scale, never the rotating body itself, so it can never read as
+   flashing. 8s is deliberately slower than any other motion in this
+   composition; "premium" here means barely perceptible, not absent. */
+@keyframes orbBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.32;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.5;
+  }
+}
+
+@keyframes orbSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Laptop: 4-6px vertical drift, 9s cycle (within the 8-12s brief). */
+.laptopFloat {
+  animation: floatLaptop 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Phone: smaller amplitude, slower cycle than the laptop — reads as a
+   different physical weight rather than a synced, mechanical duplicate. */
+.phoneFloat {
+  animation: floatPhone 11s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Orb position: slowest of the three floats, so laptop/phone/orb never
+   drift in sync with each other. */
+.orbFloat {
+  animation: floatOrb 13s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Orb glow: soft breathing, independent of the float above. */
+.orbGlow {
+  animation: orbBreathe 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Orb: slow constant rotation of the internal highlight, not the whole
+   orb's position — linear timing so it never feels like it's "landing". */
+.orbSpin {
+  animation: orbSpin 12s linear infinite;
+  will-change: transform;
+}

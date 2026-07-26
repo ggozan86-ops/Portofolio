@@ -1,0 +1,42 @@
+/*
+ * Scoped to HeroConnectionFlow only.
+ *
+ * One-shot entrance animation: the line draws itself in over roughly the
+ * first half of the sequence, holds fully lit briefly, then settles to a
+ * near-invisible permanent trace. It never loops and never repeats —
+ * `animation-fill-mode: both` (set in the shorthand below) holds the final
+ * frame forever once it finishes.
+ *
+ * `prefers-reduced-motion` is handled one level up, in the component itself
+ * (the effect is skipped before this class is ever applied) — but the
+ * global near-zero-duration override in globals.css would also neutralize
+ * it as a fallback if that check were ever bypassed.
+ */
+@keyframes connectionDraw {
+  0% {
+    stroke-dashoffset: var(--path-length);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    /* Settles to a barely-there permanent hint rather than fading to
+       nothing — "everything on the page is connected", quietly, forever. */
+    opacity: 0.06;
+  }
+}
+
+.connectionPath {
+  stroke-dasharray: var(--path-length);
+  /* Delay (900ms) lets the rest of the entrance sequence — name,
+     description, profession list, buttons, HeroVisual — settle first; the
+     line is the sequence's final beat, not a competing first impression. */
+  animation: connectionDraw 2.6s cubic-bezier(0.16, 1, 0.3, 1) 900ms both;
+  will-change: stroke-dashoffset, opacity;
+}

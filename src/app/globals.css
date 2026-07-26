@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   THEME SYSTEM
+   All color decisions live here as CSS variables so they can be consumed by
+   Tailwind (see tailwind.config.ts) AND by raw CSS (gradients, shadows) with
+   a single source of truth. Only one theme currently exists (dark/premium),
+   but keeping colors as variables makes a future light theme a matter of
+   swapping the values inside `:root`, not touching component code.
+   ========================================================================== */
+:root {
+  /* Surfaces */
+  --color-background: #09090b;
+  --color-background-secondary: #111827;
+
+  /* Foreground / text */
+  --color-foreground: #ffffff;
+  --color-foreground-muted: rgba(255, 255, 255, 0.72);
+  --color-foreground-subtle: rgba(255, 255, 255, 0.48);
+
+  /* Accents */
+  --color-accent-blue: #8ab4f8;
+  --color-accent-purple: #b9a4f5;
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Shadows (kept subtle by design — premium, not flashy) */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.24);
+  --shadow-card-hover: 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.32);
+  /* Half-strength version of --shadow-card for rest-state elevation (e.g.
+     the secondary button before hover). Defined as its own token rather
+     than a Tailwind opacity modifier, since `/50` can't parse a shadow
+     that's already a `var()` reference. */
+  --shadow-card-soft: 0 1px 1px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  /* HeroVisual device shadows — scaled to each object's physical size
+     instead of reusing one card shadow for everything. The laptop is the
+     largest, furthest-back object, so its shadow is the widest and softest
+     (light falls furthest from a bigger object); the phone sits closer to
+     the "ground" of the composition, so its shadow is tighter and a touch
+     darker at the core. Both stay well under the brief's "subtle, never
+     flashy" ceiling. */
+  --shadow-device-laptop: 0 1px 1px rgba(0, 0, 0, 0.36), 0 24px 48px -12px rgba(0, 0, 0, 0.4);
+  --shadow-device-phone: 0 1px 1px rgba(0, 0, 0, 0.4), 0 12px 28px -8px rgba(0, 0, 0, 0.36);
+
+  /* Layout */
+  --nav-height: 4.5rem;
+
+  /* Fonts (populated by next/font in layout.tsx, referenced by tailwind.config.ts) */
+  --font-sans: "Geist Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+/* ==========================================================================
+   BASE RESETS
+   ========================================================================== */
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  /* Native smooth scrolling; offsets by nav height so anchor targets aren't
+     hidden under the sticky navbar. */
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
+  /* Stops vertical rubber-banding on the page from propagating to the
+     browser's own "pull to refresh" / bounce-navigate gesture (mobile
+     Chrome/Safari). Scoped to the y-axis only — horizontal swipe-navigation
+     between browser history entries is left untouched. */
+  overscroll-behavior-y: none;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ==========================================================================
+   SCROLLBAR
+   Thin, on-brand scrollbar instead of the OS default — Firefox via the
+   standard `scrollbar-*` properties, Chrome/Safari/Edge via the
+   `::-webkit-scrollbar-*` pseudo-elements. Colors reuse existing tokens
+   (no new palette entries); track stays transparent so it never competes
+   with HeroAtmosphere's background layers underneath it.
+   ========================================================================== */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-hover) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-hover);
+  border-radius: 9999px;
+  border: 2px solid var(--color-background);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-foreground-subtle);
+  background-clip: padding-box;
+}
+
+/* Respect users who've asked the OS to reduce motion — overrides every
+   animation/transition in the app, including future sections. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible, on-brand focus ring for keyboard navigation (accessibility +
+   Lighthouse "best practices" score). */
+:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Selection color matches the accent system instead of the browser default. */
+::selection {
+  background-color: var(--color-accent-purple);
+  color: var(--color-background);
+}
+
+/* Typography polish: let the browser balance heading line-breaks and
+   soften paragraph line-breaks, instead of leaving wrap points to chance.
+   Purely a layout-quality refinement — no content, size, or weight change
+   — and both are widely supported with an automatic no-op fallback in
+   browsers that don't yet implement them. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* ==========================================================================
+   SECTION SPACING SYSTEM
+   A consistent vertical rhythm utility so every future section (hero,
+   projects, about, contact) shares the same breathing room without
+   redefining padding ad hoc. Responsive: tighter on mobile, generous on
+   large screens.
+   ========================================================================== */
+.section {
+  padding-top: var(--tw-section-py, 5rem);
+  padding-bottom: var(--tw-section-py, 5rem);
+}
+
+@media (min-width: 768px) {
+  .section {
+    --tw-section-py: 7rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .section {
+    --tw-section-py: 8rem;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL ANIMATION UTILITIES
+   GPU-friendly only: every keyframe here animates `transform` and/or
+   `opacity`, never layout-triggering properties like width/height/top/left.
+
+   PERF NOTE: the `.animate-on-scroll` utility and its own `@keyframes
+   fadeInUp` that used to live here were removed — they were unused by any
+   component (the Hero's mount animations all use Tailwind's compiled
+   `animate-fade-in-up`, defined once in tailwind.config.ts) and duplicated
+   that same keyframe under a second name. Dead CSS still costs parse/
+   bytes-over-the-wire even though it never paints anything, so it's
+   removed rather than kept "just in case".
+   ========================================================================== */

@@ -1,0 +1,99 @@
+/*
+ * Scoped to HeroAtmosphere only — colocated so this decorative layer can
+ * evolve independently of Hero.tsx, HeroVisual, or any shared file.
+ *
+ * Every keyframe animates `transform` (translate/scale) only, never
+ * `background-position`, `width`, `top`/`left`, or filter properties — all
+ * GPU-composited, none of them trigger layout or repaint of neighboring
+ * content. `prefers-reduced-motion` is already handled globally in
+ * `globals.css` (a `*` selector forcing near-zero animation duration), so
+ * every class below inherits that automatically.
+ */
+
+/* Background gradient blobs: barely-there drift, 40-60s range, so slow it
+   reads as "alive" rather than "animated". */
+@keyframes gradientDriftA {
+  0%,
+  100% {
+    transform: translate(-4%, -3%) scale(1);
+  }
+  50% {
+    transform: translate(3%, 4%) scale(1.08);
+  }
+}
+
+@keyframes gradientDriftB {
+  0%,
+  100% {
+    transform: translate(3%, 2%) scale(1);
+  }
+  50% {
+    transform: translate(-3%, -4%) scale(1.06);
+  }
+}
+
+.gradientA {
+  animation: gradientDriftA 48s ease-in-out infinite;
+  will-change: transform;
+}
+
+.gradientB {
+  animation: gradientDriftB 56s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Particle drift: three small, different paths so a dozen instances don't
+   read as one shape repeated — duration/delay are set per-instance via
+   inline style (longhand `animation-duration`/`animation-delay`), which
+   safely overrides just those two properties without fighting the
+   shorthand below. */
+@keyframes particleDriftA {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(6px, -10px);
+  }
+}
+
+@keyframes particleDriftB {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-8px, 8px);
+  }
+}
+
+@keyframes particleDriftC {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(5px, 9px);
+  }
+}
+
+.particleA {
+  animation-name: particleDriftA;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.particleB {
+  animation-name: particleDriftB;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.particleC {
+  animation-name: particleDriftC;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
