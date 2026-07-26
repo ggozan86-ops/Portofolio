@@ -30,17 +30,22 @@ export function Navbar() {
       style={{ height: "var(--nav-height)" }}
     >
       <Container className="flex h-full items-center justify-between">
-        {/* Placeholder mark — replaced with real logo/wordmark later. */}
+        {/* Personal mark: compact "MFA" initials rather than the full name —
+            reads cleaner at navbar scale and matches the minimal, premium
+            mark treatment (tracking-wide caps) common to personal-brand
+            sites. Full name kept for assistive tech via aria-label since
+            the visible text is now an abbreviation. */}
         <Link
           href="/"
+          aria-label="Muhammad Fauzan A — Home"
           className={
-            "rounded-sm text-sm font-semibold tracking-tight text-foreground " +
+            "rounded-sm text-sm font-semibold uppercase tracking-[0.2em] text-foreground " +
             "transition-opacity duration-200 hover:opacity-80 " +
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60 " +
             "focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           }
         >
-          Portfolio
+          MFA
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 sm:flex">

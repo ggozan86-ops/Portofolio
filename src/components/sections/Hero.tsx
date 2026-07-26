@@ -99,14 +99,14 @@ export function Hero() {
             </h1>
 
             <p
-              // max-w-lg (512px, up from max-w-md/448px): at the larger
-              // text-lg size this reads as ~2 lines of comfortable measure
-              // instead of wrapping a touch early — "better reading width"
-              // per the brief, without changing the copy itself. mt-5
-              // (20px) still tightens the title→description pair into one
-              // grouped unit, with the larger mt-9 below doing the work of
-              // separating that unit from the profession list.
-              className="animate-fade-in-up mt-5 max-w-lg text-lg leading-relaxed text-foreground-muted"
+              // max-w-md (448px, down from max-w-lg/512px): the previous
+              // width let a couple of lines run a touch long for
+              // comfortable reading measure — narrowing it back keeps each
+              // line closer to an ideal reading length. leading-[1.75]
+              // (up from leading-relaxed/1.625) opens the line spacing a
+              // little further for the same reason — both changes are
+              // pure readability, no copy or color change.
+              className="animate-fade-in-up mt-5 max-w-md text-lg leading-[1.75] text-foreground-muted"
               style={{ animationDelay: "160ms" }}
             >
               Crafting thoughtful digital products through code, automation,

@@ -30,13 +30,17 @@ const baseStyles =
   // `transform` and `box-shadow` added to the transition list so the new
   // hover-scale and elevation-shadow below animate smoothly instead of
   // snapping; everything else here was already being transitioned.
-  // Duration/easing intentionally match Navbar's link-underline and
-  // HeroConnectionFlow's settle — one shared "premium" motion curve for
-  // every hover-driven transition in the Hero, not a mix of ad hoc ones.
-  "transition-[transform,background-color,border-color,color,box-shadow] duration-200 ease-premium " +
+  // Duration bumped 200ms -> 250ms: pairs better with the new hover
+  // elevation below — a touch slower reads as "lifting", 200ms read as
+  // "snapping" for a translateY+scale combo this small.
+  "transition-[transform,background-color,border-color,color,box-shadow] duration-[250ms] ease-premium " +
   // Hover scale capped at 1.02 per the brief ("maximum 1.02") — enough to
-  // read as "responsive" without feeling springy or game-like. Active
-  // press (0.98) was already here and is kept as the "instant feedback" cue.
+  // read as "responsive" without feeling springy or game-like. A small
+  // upward translateY is layered on top of the scale (Tailwind composes
+  // transform utilities via CSS variables, so both apply together) — the
+  // "soft elevation" cue: the button reads as lifting off the surface, not
+  // just growing in place. Active press (0.98, no translateY) was already
+  // here and is kept as the "instant feedback" cue.
   //
   // PERF: will-change-transform is now applied only for the states that
   // actually transform (hover/focus-visible/active) instead of always-on.
@@ -48,7 +52,7 @@ const baseStyles =
   // starts, since :hover fires before the transition begins) without
   // paying that cost while idle.
   "hover:will-change-transform focus-visible:will-change-transform active:will-change-transform " +
-  "hover:scale-[1.02] active:scale-[0.98] active:duration-75 " +
+  "hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0 active:scale-[0.98] active:duration-75 " +
   // Custom focus-visible ring layered on top of the global one in
   // globals.css — keyboard users get a crisp, on-brand ring; mouse/touch
   // users never see it, since :focus-visible only fires for keyboard focus.
@@ -64,7 +68,11 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-foreground text-background hover:bg-foreground/90 font-semibold " +
     // Soft elevation on hover: a wider, blue-tinted shadow (not plain black)
     // so the "lift" reads as light rather than a heavier drop-shadow.
-    "shadow-[var(--shadow-card)] hover:shadow-[0_14px_32px_-8px_rgba(138,180,248,0.32)]",
+    // Spread/offset widened slightly to pair with the new -translate-y-0.5
+    // above — the shadow now visibly "catches up" to the raised button
+    // instead of sitting directly under it, selling the lift. Same color
+    // values as before (rgba(138,180,248,...)), only the geometry changed.
+    "shadow-[var(--shadow-card)] hover:shadow-[0_18px_38px_-10px_rgba(138,180,248,0.36)]",
   secondary:
     // A faint rest-state shadow (--shadow-card-soft, roughly half the
     // strength of --shadow-card) so the outline button reads as a raised
@@ -73,7 +81,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-background-secondary text-foreground border border-border " +
     "shadow-[var(--shadow-card-soft)] " +
     "hover:border-border-hover hover:bg-background-secondary/80 " +
-    "hover:shadow-[var(--shadow-card)]",
+    "hover:shadow-[var(--shadow-card-hover)]",
   ghost:
     "bg-transparent text-foreground-muted hover:text-foreground " +
     "hover:bg-white/5",
@@ -127,7 +135,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           {variant === "primary" && (
             <span
               aria-hidden="true"
-              className="inline-block transition-transform duration-200 ease-premium group-hover:translate-x-0.5"
+              className="inline-block transition-transform duration-[250ms] ease-premium group-hover:translate-x-1"
             >
               →
             </span>

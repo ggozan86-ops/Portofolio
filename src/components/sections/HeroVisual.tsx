@@ -25,20 +25,15 @@ interface CodeToken {
 }
 
 /**
- * A short, realistic TypeScript snippet themed around shipping a product —
- * intentionally on-topic ("Product", "deploy", "publish") rather than
- * generic lorem-style filler.
+ * A short, realistic TypeScript snippet themed around shipping this very
+ * portfolio's own work (build → automate → ship) — on-topic for a
+ * Web/AI/Automation/Bot developer rather than generic lorem-style filler.
  */
 const codeLines: CodeToken[][] = [
   [
     { text: "interface", tone: "keyword" },
-    { text: " Product ", tone: "plain" },
+    { text: " Project ", tone: "plain" },
     { text: "{", tone: "punct" },
-  ],
-  [
-    { text: "  id", tone: "plain" },
-    { text: ": ", tone: "punct" },
-    { text: "string;", tone: "type" },
   ],
   [
     { text: "  name", tone: "plain" },
@@ -46,26 +41,36 @@ const codeLines: CodeToken[][] = [
     { text: "string;", tone: "type" },
   ],
   [
-    { text: "  launchedAt", tone: "plain" },
+    { text: "  stack", tone: "plain" },
     { text: ": ", tone: "punct" },
-    { text: "Date;", tone: "type" },
+    { text: "string[];", tone: "type" },
+  ],
+  [
+    { text: "  status", tone: "plain" },
+    { text: ": ", tone: "punct" },
+    { text: '"live";', tone: "type" },
   ],
   [{ text: "}", tone: "punct" }],
   [{ text: "", tone: "plain" }],
-  [{ text: "// ship it", tone: "comment" }],
+  [{ text: "// build, automate, ship", tone: "comment" }],
   [
     { text: "export async function", tone: "keyword" },
-    { text: " deploy", tone: "plain" },
-    { text: "(product: ", tone: "punct" },
-    { text: "Product", tone: "type" },
+    { text: " ship", tone: "plain" },
+    { text: "(project: ", tone: "punct" },
+    { text: "Project", tone: "type" },
     { text: ") {", tone: "punct" },
   ],
   [
     { text: "  const build = ", tone: "plain" },
     { text: "await", tone: "keyword" },
-    { text: " compile(product);", tone: "plain" },
+    { text: " compile(project);", tone: "plain" },
   ],
-  [{ text: "  return publish(build);", tone: "plain" }],
+  [
+    { text: "  ", tone: "plain" },
+    { text: "await", tone: "keyword" },
+    { text: " automate(build);", tone: "plain" },
+  ],
+  [{ text: "  return deploy(build);", tone: "plain" }],
   [{ text: "}", tone: "punct" }],
 ];
 
@@ -81,7 +86,7 @@ const tokenToneClass: Record<CodeToken["tone"], string> = {
 /** Editor tab label — on-theme with the snippet below, gives the title bar
  * something to anchor on (real editors never show a title bar with no open
  * tab) without introducing any new fictional narrative. */
-const activeFile = "product.ts";
+const activeFile = "portfolio.ts";
 
 /** Rows for the fictional productivity-app UI shown on the phone screen.
  * `accent` alternates blue/purple per row — a computed visual variation
@@ -249,6 +254,23 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
         contain: "layout style",
       }}
     >
+      {/* Local mesh/grid texture — scoped to this composition only (not
+          HeroAtmosphere's page-wide grid), so the space immediately behind
+          the devices doesn't read as bare/empty at a glance. Extremely low
+          opacity, static (no animation), same line-grid technique already
+          used in HeroAtmosphere — no new visual language introduced. */}
+      <div
+        className="pointer-events-none absolute inset-[6%] opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--color-border) 1px, transparent 1px), " +
+            "linear-gradient(to bottom, var(--color-border) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 55%, transparent 90%)",
+        }}
+      />
+
       {/* Ambient glow: a single soft, very low-opacity radial wash behind the
           devices. Pure gradient + blur, no extra DOM weight, and subtle
           enough to add depth without becoming a "busy background".
@@ -284,7 +306,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
       {/* LAPTOP — back layer                                               */}
       {/* ---------------------------------------------------------------- */}
       <div
-        className="absolute left-1/2 top-[8%] w-[82%]"
+        className="absolute left-1/2 top-[8%] w-[97%]"
         style={{ transform: "translateX(-50%) rotateX(8deg) rotateY(-10deg)" }}
       >
         {/* Parallax wrapper: owns the mouse-driven translate3d(), separate
@@ -397,7 +419,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
       {/* PHONE — front layer, overlapping the laptop's bottom-left corner  */}
       {/* ---------------------------------------------------------------- */}
       <div
-        className="absolute bottom-[6%] left-[6%] z-10 w-[36%]"
+        className="absolute bottom-[4%] left-[14%] z-10 w-[36%]"
         style={{ transform: "rotateX(4deg) rotateY(8deg)" }}
       >
         {/* Parallax wrapper — same reasoning as the laptop's above: a
@@ -512,7 +534,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
           fixes that separation. */}
       <div
         ref={orbParallaxRef}
-        className="absolute right-[4%] top-[2%] z-20 h-[13%] w-[13%]"
+        className="absolute right-[4%] top-[2%] z-20 h-[14%] w-[14%]"
         // Endpoint marker for HeroConnectionFlow, which queries for this
         // attribute — no ref/prop plumbing needed between the two files.
         data-connection-target="orb"
@@ -559,7 +581,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
               before the glow around it is noticed. */}
           <div
             className={cn(
-              "relative h-full w-full rounded-full border border-white/25 shadow-[var(--shadow-card)]",
+              "relative h-full w-full rounded-full border border-white/30 shadow-[var(--shadow-card)]",
               styles.orbSpin
             )}
             style={{
