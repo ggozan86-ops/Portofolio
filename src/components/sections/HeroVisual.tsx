@@ -496,10 +496,23 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
       {/* No separate parallax wrapper needed here: this outer div doesn't
           set its own `transform` (only the inner `styles.orbSpin` element
           below does, for rotation), so it's safe to write the mouse-driven
-          translate3d() straight onto it via ref. */}
+          translate3d() straight onto it via ref.
+
+          z-20 added explicitly (laptop/phone have no z-index of their own,
+          phone only reaches z-10): without it the orb still wins by DOM
+          order in the default stacking layer, but that's an implicit,
+          easy-to-accidentally-break guarantee — making it explicit means
+          the orb can never silently end up visually buried under a future
+          change to either device layer. Position nudged from
+          right-[8%]/top-[5%] to right-[4%]/top-[2%] and size bumped
+          11%→13%: at the previous position/size its glow was reading as
+          part of the laptop's own ambient backlight rather than a
+          separate floating object — pushing it further out past the
+          laptop's top-right corner and giving it a touch more presence
+          fixes that separation. */}
       <div
         ref={orbParallaxRef}
-        className="absolute right-[8%] top-[5%] h-[11%] w-[11%]"
+        className="absolute right-[4%] top-[2%] z-20 h-[13%] w-[13%]"
         // Endpoint marker for HeroConnectionFlow, which queries for this
         // attribute — no ref/prop plumbing needed between the two files.
         data-connection-target="orb"
@@ -510,12 +523,18 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
         <div className={styles.orbFloat}>
           {/* Outer glow: soft breathing pulse (opacity + scale), separate
               element from the rotating body so the two motions never
-              collide on one `transform`. */}
+              collide on one `transform`. Base opacity raised (via the
+              wrapper below) so the glow reads clearly even at the low
+              point of its breathing cycle, instead of nearly disappearing
+              against the dark backdrop. */}
           <div
-            className={cn("absolute inset-[-40%] rounded-full blur-xl", styles.orbGlow)}
+            className={cn(
+              "absolute inset-[-55%] rounded-full opacity-90 blur-xl",
+              styles.orbGlow
+            )}
             style={{
               background:
-                "radial-gradient(circle, var(--color-accent-blue) 0%, transparent 70%)",
+                "radial-gradient(circle, var(--color-accent-blue) 0%, transparent 65%)",
             }}
           />
 
@@ -534,10 +553,13 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
 
           {/* Orb body: the only rotating element, via a conic-gradient sweep
               that reads as a slow, subtle internal shimmer rather than the
-              whole orb spinning in place. */}
+              whole orb spinning in place. A visible border/ring (rather
+              than the previous border-white/10) gives the sphere a crisp
+              silhouette so it reads as a solid object at a glance, even
+              before the glow around it is noticed. */}
           <div
             className={cn(
-              "relative h-full w-full rounded-full border border-white/10",
+              "relative h-full w-full rounded-full border border-white/25 shadow-[var(--shadow-card)]",
               styles.orbSpin
             )}
             style={{
@@ -551,10 +573,10 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
                 — a cheap, static "catch-light" cue that gives the orb a hint
                 of sphere-like volume instead of reading as a flat coin. */}
             <div
-              className="absolute inset-[15%] rounded-full bg-background-secondary"
+              className="absolute inset-[13%] rounded-full bg-background-secondary"
               style={{
                 backgroundImage:
-                  "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.10) 0%, transparent 55%)",
+                  "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.14) 0%, transparent 55%)",
               }}
             />
           </div>

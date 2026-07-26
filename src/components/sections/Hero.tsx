@@ -176,8 +176,18 @@ export function Hero() {
           >
             {/* Delay pushed to 420ms — after the CTAs (320ms) rather than
                 before them, so HeroVisual is now the second-to-last beat in
-                the entrance sequence, with the connection line closing it out. */}
-            <div className="animate-fade-in-up" style={{ animationDelay: "420ms" }}>
+                the entrance sequence, with the connection line closing it out.
+
+                w-full is required here, not cosmetic: this div is a flex
+                item inside HeroScrollFade's `flex items-center
+                justify-center` wrapper, so on the flex main axis it would
+                otherwise shrink to fit-content instead of stretching (flex
+                only auto-stretches on the cross axis). Without an explicit
+                width, HeroVisual's own `w-full` below has no definite
+                parent width to resolve 100% against — a classic CSS
+                collapse that renders the entire device composition at
+                near-zero size. */}
+            <div className="w-full animate-fade-in-up" style={{ animationDelay: "420ms" }}>
               <HeroVisual className="max-w-md lg:max-w-none" />
             </div>
           </HeroScrollFade>
