@@ -203,7 +203,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
     // on the page — for a visual the user can no longer see.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) attach();
+        if (entry?.isIntersecting) attach();
         else detach();
       },
       { threshold: 0 }
