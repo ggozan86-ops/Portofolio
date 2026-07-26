@@ -136,6 +136,23 @@ export function HeroAtmosphere() {
         }}
       />
 
+      {/* Vignette — a very soft radial darkening toward the section's
+          edges. This is the one addition purely for "depth" rather than
+          any specific object: without it, the gradients/grid/particles
+          above all sit at a flat, even brightness edge-to-edge, which
+          reads as a background rather than a space with the devices
+          sitting *inside* it. Static (no animation, no extra blur — just
+          a gradient), so it costs nothing beyond one more composited
+          layer already covered by this container's `contain: layout
+          paint`. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.35) 100%)",
+        }}
+      />
+
       {/* Glow — wider, brighter wash anchored to the right half of the
           section (where HeroVisual sits in the two-column layout), giving
           the devices a soft cinematic backlight without touching

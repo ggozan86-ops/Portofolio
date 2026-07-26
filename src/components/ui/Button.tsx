@@ -21,11 +21,12 @@ type ButtonAsAnchor = SharedProps &
 type ButtonProps = ButtonAsButton | ButtonAsAnchor;
 
 const baseStyles =
-  // `rounded-lg` (1rem) reads slightly more tactile/contemporary than the
-  // previous `rounded-md` (0.75rem) without becoming a pill — still firmly
-  // in "minimal" territory. `tracking-tight` tightens button labels the
-  // same way the H1 already is, so type across the Hero shares one voice.
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium tracking-tight " +
+  // `rounded-xl` (1.25rem, up from `rounded-lg`/1rem): a visibly rounder,
+  // more "premium SaaS" radius — the single biggest lever for the button's
+  // perceived polish, per the brief's Apple/Linear/Framer reference point.
+  // `tracking-tight` tightens button labels the same way the H1 already
+  // is, so type across the Hero shares one voice.
+  "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl font-medium tracking-tight " +
   // `transform` and `box-shadow` added to the transition list so the new
   // hover-scale and elevation-shadow below animate smoothly instead of
   // snapping; everything else here was already being transitioned.
@@ -63,7 +64,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-foreground text-background hover:bg-foreground/90 font-semibold " +
     // Soft elevation on hover: a wider, blue-tinted shadow (not plain black)
     // so the "lift" reads as light rather than a heavier drop-shadow.
-    "shadow-[var(--shadow-card)] hover:shadow-[0_10px_28px_-6px_rgba(138,180,248,0.28)]",
+    "shadow-[var(--shadow-card)] hover:shadow-[0_14px_32px_-8px_rgba(138,180,248,0.32)]",
   secondary:
     // A faint rest-state shadow (--shadow-card-soft, roughly half the
     // strength of --shadow-card) so the outline button reads as a raised
@@ -77,6 +78,20 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-transparent text-foreground-muted hover:text-foreground " +
     "hover:bg-white/5",
 };
+
+/**
+ * Sheen sweep: a soft diagonal highlight that slides across the button on
+ * hover — the same "light catching glass" language already established on
+ * the Hero's laptop/phone screens (see HeroVisual.tsx), reused here for
+ * visual consistency rather than invented as a one-off button effect.
+ * Absolutely positioned, `pointer-events-none`, and only ever animates
+ * `transform` (translateX) — never triggers layout, and costs nothing
+ * while idle since it's transparent and off-screen (-100%) at rest.
+ */
+const sheenStyles =
+  "pointer-events-none absolute inset-0 -translate-x-full " +
+  "bg-gradient-to-r from-transparent via-white/10 to-transparent " +
+  "transition-transform duration-700 ease-premium group-hover:translate-x-full";
 
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "h-9 px-4 text-sm",
@@ -100,6 +115,28 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
   ({ variant = "primary", size = "md", className, children, ...props }, ref) => {
     const classes = cn(baseStyles, variantStyles[variant], sizeStyles[size], className);
 
+    // Content wrapped in a `relative z-10` span so it stays above the
+    // absolutely-positioned sheen sweep below; the arrow is scoped to the
+    // `primary` variant only — it's the Hero's single highest-emphasis
+    // action ("View Projects"), so it gets the one extra affordance rather
+    // than every button on the page gaining an icon it doesn't need.
+    const content = (
+      <>
+        <span className="relative z-10 inline-flex items-center gap-2">
+          {children}
+          {variant === "primary" && (
+            <span
+              aria-hidden="true"
+              className="inline-block transition-transform duration-200 ease-premium group-hover:translate-x-0.5"
+            >
+              →
+            </span>
+          )}
+        </span>
+        <span aria-hidden="true" className={sheenStyles} />
+      </>
+    );
+
     if ("href" in props && props.href) {
       const { href, ...anchorProps } = props as ButtonAsAnchor;
       return (
@@ -109,7 +146,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           className={classes}
           {...anchorProps}
         >
-          {children}
+          {content}
         </a>
       );
     }
@@ -120,7 +157,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         className={classes}
         {...(props as ButtonAsButton)}
       >
-        {children}
+        {content}
       </button>
     );
   }

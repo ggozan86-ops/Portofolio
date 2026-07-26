@@ -103,3 +103,80 @@
   animation: orbSpin 12s linear infinite;
   will-change: transform;
 }
+
+/* Cursor caret at the end of the code snippet — a plain step-end opacity
+   toggle, the same technique every text-editor caret uses. `step-end`
+   (rather than ease) is deliberate: a real caret snaps on/off, it doesn't
+   fade, so an eased opacity transition here would actually look less
+   authentic despite being "smoother". */
+@keyframes blinkCursor {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.cursorBlink {
+  animation: blinkCursor 1.1s step-end infinite;
+}
+
+/* Satellite dot's orbit around the AI orb — a full 360° rotation of the
+   (invisible) wrapper the dot is positioned on top of. Slow and linear,
+   matching orbSpin's cadence philosophy: constant motion reads as "always
+   thinking", not attention-grabbing. */
+@keyframes orbitSatellite {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orbitRing {
+  animation: orbitSatellite 7s linear infinite;
+  will-change: transform;
+}
+
+/* Status chip: slowest float of the four animated layers (laptop 9s, phone
+   11s, orb 13s) — deliberately the calmest-moving object in the
+   composition, since it reads as background context rather than one of the
+   three "hero" objects. */
+@keyframes floatChip {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.chipFloat {
+  animation: floatChip 15s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Chip's status dot: a soft repeating pulse ring, the same visual language
+   as a "live"/"online" indicator on real dashboards (Vercel, Linear,
+   GitHub Actions). Opacity + scale only, like the orb's own breathing
+   glow — never a property that would trigger layout. */
+@keyframes chipPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+.chipPulse {
+  animation: chipPulse 2.4s ease-out infinite;
+  will-change: transform, opacity;
+}

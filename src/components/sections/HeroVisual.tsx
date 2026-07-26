@@ -78,7 +78,15 @@ const tokenToneClass: Record<CodeToken["tone"], string> = {
   punct: "text-foreground-subtle",
 };
 
-/** Rows for the fictional productivity-app UI shown on the phone screen. */
+/** Editor tab label — on-theme with the snippet below, gives the title bar
+ * something to anchor on (real editors never show a title bar with no open
+ * tab) without introducing any new fictional narrative. */
+const activeFile = "product.ts";
+
+/** Rows for the fictional productivity-app UI shown on the phone screen.
+ * `accent` alternates blue/purple per row — a computed visual variation
+ * (see render below), not new copy — so the list reads less monochrome
+ * than a single repeated dot color. */
 const appTasks: ReadonlyArray<{ label: string; time: string; done: boolean }> = [
   { label: "Design review", time: "09:30", done: true },
   { label: "Ship v2.4", time: "11:00", done: false },
@@ -203,7 +211,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
     // on the page — for a visual the user can no longer see.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) attach();
+        if (entry?.isIntersecting) attach();
         else detach();
       },
       { threshold: 0 }
@@ -256,11 +264,27 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
         }}
       />
 
+      {/* Ground shadow: a single flattened, blurred ellipse beneath the
+          whole composition. This is the cue real product photography relies
+          on to read as "resting on a surface" rather than "pasted onto the
+          background" — without it, devices floating with drop shadows alone
+          still look weightless. Pure gradient + blur (same technique as the
+          ambient glow above), so it costs nothing extra to composite. Sized
+          and positioned to sit roughly under the laptop's base, not the
+          full bounding box, so it doesn't read as a giant dark smear. */}
+      <div
+        className="pointer-events-none absolute bottom-[6%] left-1/2 h-[8%] w-[62%] -translate-x-1/2 rounded-[50%] opacity-70 blur-2xl"
+        style={{
+          background:
+            "radial-gradient(ellipse, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, transparent 80%)",
+        }}
+      />
+
       {/* ---------------------------------------------------------------- */}
       {/* LAPTOP — back layer                                               */}
       {/* ---------------------------------------------------------------- */}
       <div
-        className="absolute left-1/2 top-[10%] w-[78%]"
+        className="absolute left-1/2 top-[8%] w-[82%]"
         style={{ transform: "translateX(-50%) rotateX(8deg) rotateY(-10deg)" }}
       >
         {/* Parallax wrapper: owns the mouse-driven translate3d(), separate
@@ -277,11 +301,26 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
           <div
             className="relative overflow-hidden rounded-t-lg border border-border bg-background-secondary shadow-[var(--shadow-device-laptop)]"
           >
-            {/* Title bar */}
+            {/* Title bar: real (muted) traffic-light colors instead of flat
+                grey dots — a small, instantly-recognizable realism cue that
+                costs nothing extra (still just three spans), kept soft via
+                opacity rather than full-saturation so it reads as premium
+                rather than literally mimicking macOS chrome. */}
             <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
-              <span className="h-2 w-2 rounded-full bg-foreground-subtle/60" />
-              <span className="h-2 w-2 rounded-full bg-foreground-subtle/60" />
-              <span className="h-2 w-2 rounded-full bg-foreground-subtle/60" />
+              <span className="h-2 w-2 rounded-full bg-[#FF5F57]/70" />
+              <span className="h-2 w-2 rounded-full bg-[#FEBC2E]/70" />
+              <span className="h-2 w-2 rounded-full bg-[#28C840]/70" />
+            </div>
+
+            {/* Tab bar: a single active file tab, the detail that makes the
+                title bar above read as "an editor with a file open" instead
+                of a generic window chrome. One div, matches the existing
+                border/background tokens already used everywhere else here. */}
+            <div className="flex items-center border-b border-border bg-background/40 px-3">
+              <span className="flex items-center gap-1.5 border-b-2 border-accent-blue py-1.5 pr-3 text-[6.5px] font-medium text-foreground sm:text-[7.5px] lg:text-[9px]">
+                <span className="h-[5px] w-[5px] shrink-0 rounded-[2px] bg-accent-blue/70" />
+                {activeFile}
+              </span>
             </div>
 
             {/* Code editor body */}
@@ -294,16 +333,32 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
               </div>
               {/* Code tokens */}
               <div className="min-w-0 flex-1">
-                {codeLines.map((line, i) => (
-                  <div key={i} className="whitespace-pre">
-                    {line.map((token, j) => (
-                      <span key={j} className={tokenToneClass[token.tone]}>
-                        {token.text}
-                      </span>
-                    ))}
-                    {line.length === 0 && "\u00A0"}
-                  </div>
-                ))}
+                {codeLines.map((line, i) => {
+                  const isLastLine = i === codeLines.length - 1;
+                  return (
+                    <div key={i} className="whitespace-pre">
+                      {line.map((token, j) => (
+                        <span key={j} className={tokenToneClass[token.tone]}>
+                          {token.text}
+                        </span>
+                      ))}
+                      {line.length === 0 && "\u00A0"}
+                      {/* Blinking caret after the final line — the one
+                          purely CSS `opacity` keyframe in the whole editor,
+                          cheap enough to run indefinitely, and the detail
+                          that most sells "live code" rather than a static
+                          screenshot. */}
+                      {isLastLine && (
+                        <span
+                          className={cn(
+                            "ml-[1px] inline-block h-[0.9em] w-[1.5px] translate-y-[0.15em] bg-accent-blue align-middle",
+                            styles.cursorBlink
+                          )}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -323,8 +378,16 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
 
           {/* Base / keyboard deck — a slim trapezoid-like bar beneath the
               screen, just wide enough to read as "laptop", not a full
-              illustrated keyboard. */}
-          <div className="mx-auto h-2 w-[104%] -translate-x-[2%] rounded-b-md border border-t-0 border-border bg-background-secondary/80" />
+              illustrated keyboard. A subtle top-to-bottom gradient (instead
+              of a flat fill) gives this thin bar a hint of the same
+              beveled-metal look real laptop decks catch light on. */}
+          <div
+            className="mx-auto h-2 w-[104%] -translate-x-[2%] rounded-b-md border border-t-0 border-border"
+            style={{
+              background:
+                "linear-gradient(to bottom, var(--color-background-secondary) 0%, var(--color-background) 100%)",
+            }}
+          />
           <div className="mx-auto h-[3px] w-[70%] rounded-b-full bg-border" />
         </div>
         </div>
@@ -334,7 +397,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
       {/* PHONE — front layer, overlapping the laptop's bottom-left corner  */}
       {/* ---------------------------------------------------------------- */}
       <div
-        className="absolute bottom-[6%] left-[6%] z-10 w-[34%]"
+        className="absolute bottom-[6%] left-[6%] z-10 w-[36%]"
         style={{ transform: "rotateX(4deg) rotateY(8deg)" }}
       >
         {/* Parallax wrapper — same reasoning as the laptop's above: a
@@ -342,19 +405,44 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
             from the static tilt (parent) and the float animation (child). */}
         <div ref={phoneParallaxRef}>
         <div className={styles.phoneFloat}>
-          <div className="relative overflow-hidden rounded-[1.1rem] border border-border bg-background-secondary shadow-[var(--shadow-device-phone)]">
-            {/* Status bar: a minimal camera-cutout pill, nothing branded */}
-            <div className="flex justify-center py-1.5">
-              <span className="h-1.5 w-6 rounded-full bg-foreground-subtle/40" />
+          <div className="relative overflow-hidden rounded-[1.4rem] border border-border bg-background-secondary shadow-[var(--shadow-device-phone)]">
+            {/* Status bar: a dark "dynamic island" pill (rather than a plain
+                camera-cutout dot) — the single most recognizable modern-
+                smartphone cue, and still just one extra div/one extra
+                background color. */}
+            <div className="relative flex justify-center py-2">
+              <span className="h-[9px] w-9 rounded-full bg-background" />
             </div>
 
             {/* App content: fictional "Today" productivity view */}
             <div className="space-y-2.5 px-3 pb-3">
-              <p className="text-[7px] font-semibold text-foreground sm:text-[8px] lg:text-[10px]">
-                Today
-              </p>
+              {/* Header row: title + a small radial completion ring, giving
+                  the header the same "at a glance" data-visualization feel
+                  as a real productivity app rather than plain text alone.
+                  The ring is a conic-gradient circle — the exact technique
+                  already used for the AI orb below, so this introduces no
+                  new rendering approach to the composition. */}
+              <div className="flex items-center justify-between pt-0.5">
+                <div>
+                  <p className="text-[7px] font-semibold text-foreground sm:text-[8px] lg:text-[10px]">
+                    Today
+                  </p>
+                  <p className="text-[5.5px] text-foreground-subtle sm:text-[6.5px] lg:text-[7.5px]">
+                    1 of 3 done
+                  </p>
+                </div>
+                <div
+                  className="relative h-[14px] w-[14px] shrink-0 rounded-full sm:h-4 sm:w-4"
+                  style={{
+                    background:
+                      "conic-gradient(var(--color-accent-blue) 0% 33%, var(--color-border) 33% 100%)",
+                  }}
+                >
+                  <div className="absolute inset-[2px] rounded-full bg-background-secondary" />
+                </div>
+              </div>
 
-              {appTasks.map((task) => (
+              {appTasks.map((task, index) => (
                 <div
                   key={task.label}
                   className="flex items-center gap-1.5 rounded-md border border-border bg-background/60 px-1.5 py-1.5"
@@ -364,7 +452,9 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
                       "h-2 w-2 shrink-0 rounded-full border",
                       task.done
                         ? "border-accent-blue bg-accent-blue"
-                        : "border-foreground-subtle bg-transparent"
+                        : index % 2 === 1
+                          ? "border-accent-purple/70 bg-transparent"
+                          : "border-foreground-subtle bg-transparent"
                     )}
                   />
                   <span className="min-w-0 flex-1 truncate text-[6.5px] text-foreground-muted sm:text-[7.5px] lg:text-[9px]">
@@ -375,6 +465,13 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
                   </span>
                 </div>
               ))}
+            </div>
+
+            {/* Home indicator: the thin rounded bar every modern iOS-style
+                phone mockup has at the very bottom — a one-line addition
+                that immediately reads as "phone" even at a glance. */}
+            <div className="flex justify-center pb-2 pt-1">
+              <span className="h-[3px] w-8 rounded-full bg-foreground-subtle/30" />
             </div>
 
             {/* Glass reflection — same technique as the laptop screen, kept
@@ -402,7 +499,7 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
           translate3d() straight onto it via ref. */}
       <div
         ref={orbParallaxRef}
-        className="absolute right-[10%] top-[6%] h-[9%] w-[9%]"
+        className="absolute right-[8%] top-[5%] h-[11%] w-[11%]"
         // Endpoint marker for HeroConnectionFlow, which queries for this
         // attribute — no ref/prop plumbing needed between the two files.
         data-connection-target="orb"
@@ -421,6 +518,20 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
                 "radial-gradient(circle, var(--color-accent-blue) 0%, transparent 70%)",
             }}
           />
+
+          {/* Satellite: a single small dot orbiting the orb on its own
+              rotating ring — the classic "AI is thinking/active" visual
+              shorthand, built the same way the orb's own internal shimmer
+              is (a CSS `rotate` keyframe on an invisible circular wrapper).
+              The dot itself doesn't rotate in place, only its position
+              around the ring — so it never looks like a spinning icon,
+              just a small light circling the orb. */}
+          <div className={cn("absolute inset-[-55%]", styles.orbitRing)}>
+            <span
+              className="absolute left-1/2 top-0 h-[9%] w-[9%] -translate-x-1/2 rounded-full bg-accent-purple shadow-[0_0_6px_1px_var(--color-accent-purple)]"
+            />
+          </div>
+
           {/* Orb body: the only rotating element, via a conic-gradient sweep
               that reads as a slow, subtle internal shimmer rather than the
               whole orb spinning in place. */}
@@ -446,6 +557,40 @@ function HeroVisualImpl({ className }: HeroVisualProps) {
                   "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.10) 0%, transparent 55%)",
               }}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* STATUS CHIP — small floating card, the compositional "third        */}
+      {/* weight" that keeps the upper-left of the frame from reading empty  */}
+      {/* ---------------------------------------------------------------- */}
+      {/* On-theme with the "ship it" code snippet on the laptop and the
+          task-completion UI on the phone — a small "deployed" status card,
+          the kind of ambient detail Linear/Vercel-style marketing sites use
+          to fill negative space with something that still feels like real
+          product UI rather than an arbitrary decorative shape. Positioned
+          in the gap above the laptop and left of the orb; its own float
+          animation (slowest of the four) keeps it from moving in sync with
+          any other layer. No parallax wrapper — this card is meant to read
+          as sitting further back/passive compared to the three interactive-
+          feeling objects, so it only gets the ambient float, not the
+          mouse-driven depth shift. */}
+      <div className="absolute left-[2%] top-[2%] hidden w-[30%] sm:block">
+        <div className={styles.chipFloat}>
+          <div className="flex items-center gap-1.5 rounded-full border border-border bg-background-secondary/90 px-2.5 py-1.5 shadow-[var(--shadow-card-soft)]">
+            <span className="relative flex h-1.5 w-1.5 shrink-0">
+              <span className="absolute inset-0 rounded-full bg-accent-blue" />
+              <span
+                className={cn(
+                  "absolute inset-[-3px] rounded-full bg-accent-blue/60",
+                  styles.chipPulse
+                )}
+              />
+            </span>
+            <span className="truncate text-[6.5px] font-medium tracking-tight text-foreground-muted sm:text-[7.5px] lg:text-[9px]">
+              Build passing
+            </span>
           </div>
         </div>
       </div>

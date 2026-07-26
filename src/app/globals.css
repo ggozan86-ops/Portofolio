@@ -44,8 +44,15 @@
      the "ground" of the composition, so its shadow is tighter and a touch
      darker at the core. Both stay well under the brief's "subtle, never
      flashy" ceiling. */
-  --shadow-device-laptop: 0 1px 1px rgba(0, 0, 0, 0.36), 0 24px 48px -12px rgba(0, 0, 0, 0.4);
-  --shadow-device-phone: 0 1px 1px rgba(0, 0, 0, 0.4), 0 12px 28px -8px rgba(0, 0, 0, 0.36);
+  /* Each gets one extra, very soft color-tinted layer on top of its black
+     shadow (accent-blue for the laptop, accent-purple for the phone) — the
+     detail that separates a "premium ambient light" product shot from a
+     plain drop shadow. Kept low-opacity/wide-spread so it reads as
+     environment bounce light, not a colored glow effect. */
+  --shadow-device-laptop: 0 1px 1px rgba(0, 0, 0, 0.36), 0 24px 48px -12px rgba(0, 0, 0, 0.4),
+    0 40px 88px -24px rgba(138, 180, 248, 0.16);
+  --shadow-device-phone: 0 1px 1px rgba(0, 0, 0, 0.4), 0 12px 28px -8px rgba(0, 0, 0, 0.36),
+    0 24px 56px -16px rgba(185, 164, 245, 0.18);
 
   /* Layout */
   --nav-height: 4.5rem;

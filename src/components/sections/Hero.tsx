@@ -82,31 +82,31 @@ export function Hero() {
           <HeroScrollFade speed={1} fadeAmount={0.6}>
           <div className="flex flex-col items-start text-left">
             <h1
-              // Fluid clamp() replaces the old text-4xl/5xl/6xl breakpoint
-              // jumps. Coefficients are chosen so this curve passes through
-              // the *exact same sizes* the old classes gave at 320px
-              // (38px/2.375rem, from text-4xl), 640px (48px/3rem, text-5xl)
-              // and 1024px+ (60px/3.75rem, text-6xl) — so nothing changes
-              // at any previously-tested breakpoint — while every width in
-              // between (375, 768...) now scales smoothly instead of
-              // holding one size until the next hard jump. Flat above
-              // 1024px, same as before, since the Container's max-width
-              // already caps line length for 1440/1920/4K. leading-[1.05]
-              // pins line-height precisely rather than relying on the
-              // type-scale default.
-              className="animate-fade-in-up text-[clamp(2rem,1.75rem+3.125vw,3.75rem)] font-semibold leading-[1.05] tracking-tight text-foreground"
+              // Fluid clamp() — raised from the previous 2rem→3.75rem curve
+              // to 2.125rem→4.5rem. Mobile (320px) barely moves (32px→34px)
+              // so small-screen line-wrapping is unaffected; the ceiling at
+              // 1024px+ is now 72px instead of 60px, which is the single
+              // biggest lever for "the name should dominate the Hero" —
+              // everything else in this file is spacing/color, this is the
+              // one actual size increase. font-bold (up from font-semibold)
+              // adds the weight to carry that larger size without looking
+              // thin. leading-[1.05] pins line-height precisely rather than
+              // relying on the type-scale default.
+              className="animate-fade-in-up text-[clamp(2.125rem,1.6rem+4.4vw,4.5rem)] font-bold leading-[1.05] tracking-tight text-foreground"
               style={{ animationDelay: "80ms" }}
             >
               Muhammad Fauzan A
             </h1>
 
             <p
-              // mt-5 (20px, down from 24px): tightens the title→description
-              // pair slightly so they read as one grouped unit, with the
-              // larger mt-9 below it doing the work of separating that unit
-              // from the profession list — a clearer two-tier rhythm than
-              // three similarly-sized gaps in a row.
-              className="animate-fade-in-up mt-5 max-w-md text-lg leading-relaxed text-foreground-muted"
+              // max-w-lg (512px, up from max-w-md/448px): at the larger
+              // text-lg size this reads as ~2 lines of comfortable measure
+              // instead of wrapping a touch early — "better reading width"
+              // per the brief, without changing the copy itself. mt-5
+              // (20px) still tightens the title→description pair into one
+              // grouped unit, with the larger mt-9 below doing the work of
+              // separating that unit from the profession list.
+              className="animate-fade-in-up mt-5 max-w-lg text-lg leading-relaxed text-foreground-muted"
               style={{ animationDelay: "160ms" }}
             >
               Crafting thoughtful digital products through code, automation,
@@ -116,24 +116,28 @@ export function Hero() {
             {/* Profession list: plain vertical list, not badges/pills —
                 hairline dividers create rhythm without adding visual weight. */}
             <ul
-              className="animate-fade-in-up mt-9 flex flex-col gap-3"
+              // gap tightened from 12px to 10px: under the larger H1 above,
+              // the previous gap read slightly loose relative to the tighter
+              // title→description rhythm — this brings the list's own
+              // internal rhythm back in line with the rest of the column.
+              className="animate-fade-in-up mt-9 flex flex-col gap-2.5"
               style={{ animationDelay: "240ms" }}
             >
               {professions.map((role) => (
                 <li
                   key={role}
-                  // Typography-only refinement (per the brief — no per-item
-                  // load animation): tighter tracking and medium weight read
-                  // as more "designed" than the plain default text-base, and
-                  // a static hover-to-full-opacity gives a little life
-                  // without animating each item on mount. leading-none since
-                  // these are short single-line labels — the default
-                  // paragraph line-height only added unused vertical space
-                  // inside each <li>.
+                  // A single-pixel hairline (down from 2px) reads as a
+                  // cleaner, more precise divider at this scale — 2px next
+                  // to 1px text strokes was starting to look slightly heavy
+                  // rather than "hairline". border-border-hover on rest
+                  // (rather than only on :hover) gives the whole list a
+                  // touch more definition against the background even
+                  // before any interaction, since it was reading a little
+                  // too faint next to the now-bolder name above it.
                   className={
-                    "border-l-2 border-border pl-4 text-[15px] font-medium leading-none " +
+                    "border-l border-border-hover pl-3.5 text-[15px] font-medium leading-none " +
                     "tracking-tight text-foreground-muted/90 " +
-                    "transition-colors duration-300 ease-premium hover:border-border-hover hover:text-foreground"
+                    "transition-colors duration-300 ease-premium hover:border-accent-blue/60 hover:text-foreground"
                   }
                 >
                   {role}
